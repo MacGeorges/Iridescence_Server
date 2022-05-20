@@ -8,18 +8,12 @@ using UnityEngine;
 [System.Serializable]
 public class ClientHandler
 {
-    //public Socket socket;
     public StateObject state;
 
     public void Send(string data)
     {
-        Debug.Log("Sending using Socket : " + state.workSocket);
-        Debug.Log("Sending using Socket RemoteEndPoint : " + state.workSocket.RemoteEndPoint.ToString());
-
-        // Convert the string data to byte data using ASCII encoding.  
         byte[] byteData = Encoding.ASCII.GetBytes(data);
 
-        // Begin sending the data to the remote device.  
         state.workSocket.BeginSend(byteData, 0, byteData.Length, 0,
             new AsyncCallback(SendCallback), state.workSocket);
     }
@@ -28,10 +22,6 @@ public class ClientHandler
     {
         try
         {
-            // Retrieve the socket from the state object.  
-            //Socket handler = (Socket)ar.AsyncState;
-
-            // Complete sending the data to the remote device.  
             int bytesSent = state.workSocket.EndSend(ar);
             Debug.Log("Sent " + bytesSent + " bytes to client.");
 
@@ -46,12 +36,6 @@ public class ClientHandler
     {
         try
         {
-            Debug.Log("Client begin recieve");
-            // Create the state object.  
-            //state = new StateObject();
-            //state.workSocket = socket;
-
-            // Begin receiving the data from the remote device.  
             state.workSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
                 new AsyncCallback(ReceiveCallback), state);
         }
@@ -65,26 +49,17 @@ public class ClientHandler
     {
         try
         {
-            Debug.Log("Client ReceiveCallback");
             string response = string.Empty;
-
-            // Retrieve the state object and the client socket
-            // from the asynchronous state object.  
-            //state = (StateObject)ar.AsyncState;
-            //Socket client = state.workSocket;
 
             // Read data from the remote device.  
             int bytesRead = state.workSocket.EndReceive(ar);
-
-            Debug.Log("Recieved " + bytesRead + " bytes");
 
             if (bytesRead > 0)
             {
                 response = Encoding.ASCII.GetString(state.buffer, 0, bytesRead);
 
-                Debug.Log("response : " + response);
+                Debug.Log("Client message : " + response);
 
-                // Get the rest of the data.  
                 state.workSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
                     new AsyncCallback(ReceiveCallback), state);
             }
