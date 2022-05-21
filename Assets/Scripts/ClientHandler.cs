@@ -58,7 +58,6 @@ public class ClientHandler
         {
             string message = string.Empty;
 
-            // Read data from the remote device.  
             int bytesRead = state.workSocket.EndReceive(ar);
 
             if (bytesRead > 0)
