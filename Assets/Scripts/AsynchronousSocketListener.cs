@@ -30,8 +30,7 @@ public class AsynchronousSocketListener
         IPAddress ipAddress = ipHostInfo.AddressList[0];
         IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
 
-        Socket listener = new Socket(ipAddress.AddressFamily,
-            SocketType.Stream, ProtocolType.Tcp);
+        Socket listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
         try
         {
             listener.Bind(localEndPoint);
@@ -41,9 +40,7 @@ public class AsynchronousSocketListener
             {
                 allDone.Reset();
 
-                listener.BeginAccept(
-                    new AsyncCallback(AcceptCallback),
-                    listener);
+                listener.BeginAccept(new AsyncCallback(AcceptCallback), listener);
 
                 allDone.WaitOne();
             }
@@ -52,14 +49,13 @@ public class AsynchronousSocketListener
         {
             UnityEngine.Debug.Log(e.ToString());
         }
-
+        ShutdownSocket(listener);
         UnityEngine.Debug.Log("\nServer Stopped");
-        Console.Read();
-
     }
 
     public static void AcceptCallback(IAsyncResult ar)
     {
+        UnityEngine.Debug.Log("AcceptCallback");
         allDone.Set();
 
         Socket listener = (Socket)ar.AsyncState;
@@ -67,12 +63,24 @@ public class AsynchronousSocketListener
 
         ClientHandler clientHandler = new ClientHandler();
 
+        clientHandler.user = new NetworkUser();
+        clientHandler.user.userType = UserType.client;
+
         clientHandler.state = new StateObject();
         clientHandler.state.workSocket = handler;
 
         ClientsManager.instance.connectedClients.Add(clientHandler);
         UnityEngine.Debug.Log("\nNew client connected");
 
+        //clientHandler.Receive();
+        UnityEngine.Debug.Log("Requesting user Login");
+        clientHandler.Send(RequestType.login);
         clientHandler.Receive();
+    }
+
+    public static void ShutdownSocket(Socket socket)
+    {
+        socket.Shutdown(SocketShutdown.Both);
+        socket.Close();
     }
 }

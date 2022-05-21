@@ -5,17 +5,15 @@ using UnityEngine;
 
 public class ServerManager : MonoBehaviour
 {
+    public NetworkUser server;
+
+    public static ServerManager instance;
+
     void Start()
     {
+        instance = this;
+
         Thread listenerThread = new Thread(AsynchronousSocketListener.StartListening);
         listenerThread.Start();
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            ClientsManager.instance.connectedClients[0].Send("Server just pressed a key!<EOF>");
-        }
     }
 }
