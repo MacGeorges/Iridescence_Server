@@ -62,12 +62,31 @@ public class ClientHandler
             if (bytesRead > 0)
             {
                 message = Encoding.ASCII.GetString(state.buffer, 0, bytesRead);
-                //Debug.Log("Client message : " + message);
 
-                HandleRequest(JsonUtility.FromJson<NetworkRequest>(message));
+                if (message.Contains("<EOF>"))
+                {
+                    string[] messages = message.Split("<EOF>");
 
-                state.workSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
+                    foreach (string subMessage in messages)
+                    {
+                        string cleanSubMessage = subMessage.Replace("<EOF>", "");
+
+                        if (string.IsNullOrEmpty(cleanSubMessage)) { continue; }
+
+                        HandleRequest(JsonUtility.FromJson<NetworkRequest>(cleanSubMessage));
+                    }
+
+                    state.buffer = new byte[StateObject.BufferSize];
+                    state.workSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
                     new AsyncCallback(ReceiveCallback), state);
+
+                    return;
+                }
+
+                // Not all data received. Get more.  
+                state.workSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
+                new AsyncCallback(ReceiveCallback), state);
+
             }
         }
         catch (Exception e)

@@ -52,7 +52,10 @@ public class ClientsManager : MonoBehaviour
 
         if(client != null)
         {
-            pendingAvatarsUpdate.Add(client, JsonUtility.FromJson<PlayerActionRequest>(playerRequest.serializedRequest).spatialData);
+            if (!pendingAvatarsUpdate.ContainsKey(client))
+            {
+                pendingAvatarsUpdate.Add(client, JsonUtility.FromJson<PlayerActionRequest>(playerRequest.serializedRequest).spatialData);
+            }
         }
     }
 }
