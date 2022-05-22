@@ -70,7 +70,7 @@ public class AsynchronousSocketListener
         clientHandler.state.workSocket = handler;
 
         ClientsManager.instance.connectedClients.Add(clientHandler);
-        ClientsManager.instance.pendingAvatars.Add(clientHandler);
+        ClientsManager.instance.pendingAvatarsAdd.Add(clientHandler);
         UnityEngine.Debug.Log("\nNew client connected");
 
         //clientHandler.Receive();

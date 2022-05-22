@@ -18,16 +18,16 @@ public class NetworkAvatar : MonoBehaviour
 
     IEnumerator InitSphere()
     {
-        while(sphereCollider.radius < 0.1)
+        while(sphereCollider.radius < 10)
         {
-            sphereCollider.radius += 0.001f;
+            sphereCollider.radius += 0.01f;
             yield return new WaitForEndOfFrame();
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("Avatar detected : " + other);
+        //Debug.Log("Avatar detected : " + other);
 
         EnvironmentPart environmentPart = other.GetComponentInParent<EnvironmentPart>();
 
@@ -49,7 +49,7 @@ public class NetworkAvatar : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        Debug.Log("Avatar leaving : " + other);
+        //Debug.Log("Avatar leaving : " + other);
 
         EnvironmentPart environmentPart = other.GetComponentInParent<EnvironmentPart>();
 

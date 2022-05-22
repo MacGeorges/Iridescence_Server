@@ -19,7 +19,7 @@ public class ClientHandler
     {
         byte[] byteData = Encoding.ASCII.GetBytes(JsonUtility.ToJson(request) + "<EOF>");
 
-        Debug.Log("Sending message to client : " + JsonUtility.ToJson(request));
+        //Debug.Log("Sending message to client : " + JsonUtility.ToJson(request));
 
         state.workSocket.BeginSend(byteData, 0, byteData.Length, 0,
             new AsyncCallback(SendCallback), state.workSocket);
@@ -30,7 +30,7 @@ public class ClientHandler
         try
         {
             int bytesSent = state.workSocket.EndSend(ar);
-            Debug.Log("Sent " + bytesSent + " bytes to client.");
+            //Debug.Log("Sent " + bytesSent + " bytes to client.");
         }
         catch (Exception e)
         {
@@ -96,6 +96,7 @@ public class ClientHandler
                 ChatManager.instance.ChatRecieved(request);
                 break;
             case RequestType.playerAction:
+                ClientsManager.instance.AvatarUpdate(request);
                 break;
             default:
                 break;

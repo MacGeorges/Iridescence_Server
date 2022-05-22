@@ -7,7 +7,9 @@ public class ClientsManager : MonoBehaviour
 {
     public List<ClientHandler> connectedClients = new List<ClientHandler>();
 
-    public List<ClientHandler> pendingAvatars = new List<ClientHandler>();
+    public List<ClientHandler> pendingAvatarsAdd = new List<ClientHandler>();
+
+    public Dictionary<ClientHandler, SerializableTransform> pendingAvatarsUpdate = new Dictionary<ClientHandler, SerializableTransform>();
 
     public NetworkAvatar avatarPrefab;
 
@@ -20,18 +22,37 @@ public class ClientsManager : MonoBehaviour
 
     private void Update()
     {
-        if (pendingAvatars.Count > 0)
+        List<ClientHandler> pendingAvatarsAddWork = new List<ClientHandler>(pendingAvatarsAdd);
+        pendingAvatarsAdd = new List<ClientHandler>();
+
+        foreach (ClientHandler pendingAvatar in pendingAvatarsAddWork)
         {
-            foreach (ClientHandler pendingAvatar in pendingAvatars)
-            {
-                if (pendingAvatar.avatarRef) { continue; }
+            if (pendingAvatar.avatarRef) { continue; }
 
-                NetworkAvatar newAvatar = Instantiate(avatarPrefab);
-                pendingAvatar.avatarRef = newAvatar;
-                newAvatar.clientHandlerRef = pendingAvatar;
-            }
+            NetworkAvatar newAvatar = Instantiate(avatarPrefab);
+            pendingAvatar.avatarRef = newAvatar;
+            newAvatar.clientHandlerRef = pendingAvatar;
+        }
 
-            pendingAvatars = new List<ClientHandler>();
+        Dictionary<ClientHandler, SerializableTransform> pendingAvatarsUpdateWork = new Dictionary<ClientHandler, SerializableTransform>(pendingAvatarsUpdate);
+        pendingAvatarsUpdate = new Dictionary<ClientHandler, SerializableTransform>();
+
+        foreach(KeyValuePair<ClientHandler, SerializableTransform> pendingAvatar in pendingAvatarsUpdateWork)
+        {
+            if (!pendingAvatar.Key.avatarRef) { continue; }
+
+            pendingAvatar.Key.avatarRef.transform.position = pendingAvatar.Value.position.ToVector3();
+            pendingAvatar.Key.avatarRef.transform.rotation = pendingAvatar.Value.rotation.ToQuaternion();
+        }
+    }
+
+    public void AvatarUpdate(NetworkRequest playerRequest)
+    {
+        ClientHandler client = connectedClients.Find(c => c.user.userID == playerRequest.sender.userID);
+
+        if(client != null)
+        {
+            pendingAvatarsUpdate.Add(client, JsonUtility.FromJson<PlayerActionRequest>(playerRequest.serializedRequest).spatialData);
         }
     }
 }
