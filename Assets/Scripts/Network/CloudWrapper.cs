@@ -12,6 +12,11 @@ public static class CloudWrapper
         SendRequest(RequestMethod.Get, Cloud_Access_URL + "GetAllRegionElements.php", Callback);
     }
 
+    public static void GetPartData(int partID, System.Action<string> Callback)
+    {
+        SendRequest(RequestMethod.Get, Cloud_Access_URL + "GetPartData.php?PartID=" + partID, Callback);
+    }
+
     private static CloudWrapperHelper BuildHelper()
     {
         GameObject wrapperHelper = new GameObject();

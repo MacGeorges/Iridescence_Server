@@ -6,6 +6,21 @@ using UnityEngine;
 public class EnvironmentStructures {}
 
 [Serializable]
+public struct Part
+{
+    public int partID;
+    public string resourceURL;
+}
+
+[Serializable]
+public struct SerializableTransform
+{
+    public SerializableVector3 position;
+    public SerializableQuaternion rotation;
+    public SerializableVector3 scale;
+}
+
+[Serializable]
 public struct RegionElements
 {
     public List<RegionElement> regionElements;
@@ -14,9 +29,9 @@ public struct RegionElements
 [Serializable]
 public struct RegionElement
 {
-    public SerializableVector3 elementPosition;
-    public SerializableQuaternion elementRotation;
-    public SerializableVector3 elementScale;
+    public int elementID;
+    public int modelID;
+    public SerializableTransform spatialData;
 }
 
 [Serializable]
