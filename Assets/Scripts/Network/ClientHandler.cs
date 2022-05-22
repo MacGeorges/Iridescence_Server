@@ -11,6 +11,8 @@ public class ClientHandler
     public NetworkUser user;
     public StateObject state;
 
+    public NetworkAvatar avatarRef;
+
     public bool authenticated;
 
     public void Send(RequestType requestType, string data = "")
@@ -20,7 +22,9 @@ public class ClientHandler
         newRequest.requestType = requestType;
         newRequest.serializedRequest = data;
 
-        byte[] byteData = Encoding.ASCII.GetBytes(JsonUtility.ToJson(newRequest));
+        byte[] byteData = Encoding.ASCII.GetBytes(JsonUtility.ToJson(newRequest) + "<EOF>");
+
+        Debug.Log("Sending message to client : " + JsonUtility.ToJson(newRequest));
 
         state.workSocket.BeginSend(byteData, 0, byteData.Length, 0,
             new AsyncCallback(SendCallback), state.workSocket);

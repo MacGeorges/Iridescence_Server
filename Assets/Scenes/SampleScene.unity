@@ -153,6 +153,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   connectedClients: []
+  pendingAvatars: []
+  avatarPrefab: {fileID: 1114822241296765931, guid: 5e4457bee8d87464f8e3cbbba4098968, type: 3}
 --- !u!4 &50087121
 Transform:
   m_ObjectHideFlags: 0
@@ -557,7 +559,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   regionElements:
     regionElements: []
-  parts: []
 --- !u!4 &2145097925
 Transform:
   m_ObjectHideFlags: 0
