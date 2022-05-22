@@ -15,16 +15,11 @@ public class ClientHandler
 
     public bool authenticated;
 
-    public void Send(RequestType requestType, string data = "")
+    public void Send(NetworkRequest request)
     {
-        NetworkRequest newRequest = new NetworkRequest();
-        newRequest.sender = ServerManager.instance.server;
-        newRequest.requestType = requestType;
-        newRequest.serializedRequest = data;
+        byte[] byteData = Encoding.ASCII.GetBytes(JsonUtility.ToJson(request) + "<EOF>");
 
-        byte[] byteData = Encoding.ASCII.GetBytes(JsonUtility.ToJson(newRequest) + "<EOF>");
-
-        Debug.Log("Sending message to client : " + JsonUtility.ToJson(newRequest));
+        Debug.Log("Sending message to client : " + JsonUtility.ToJson(request));
 
         state.workSocket.BeginSend(byteData, 0, byteData.Length, 0,
             new AsyncCallback(SendCallback), state.workSocket);
@@ -87,7 +82,7 @@ public class ClientHandler
         switch (request.requestType)
         {
             case RequestType.ping:
-                Send(RequestType.ping);
+                Send(request);
                 break;
             case RequestType.login:
                 user.userID = request.sender.userID;

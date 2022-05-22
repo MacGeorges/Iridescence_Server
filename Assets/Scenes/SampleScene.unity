@@ -625,6 +625,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: ChatManager
       objectReference: {fileID: 0}
+    - target: {fileID: 4612139853914973537, guid: f9f9b5f2c9af10e46b1b42ddca5f587e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4612139853914973541, guid: f9f9b5f2c9af10e46b1b42ddca5f587e, type: 3}
       propertyPath: m_Pivot.x
       value: 0

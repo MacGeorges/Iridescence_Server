@@ -33,7 +33,39 @@ public class NetworkAvatar : MonoBehaviour
 
         if (environmentPart)
         {
-            clientHandlerRef.Send(RequestType.objectUpdate, JsonUtility.ToJson(environmentPart.partData));
+            NetworkRequest request = new NetworkRequest();
+            request.sender = ServerManager.instance.server;
+            request.requestType = RequestType.objectUpdate;
+
+            ObjectRequest objectRequest = new ObjectRequest();
+            objectRequest.requestType = ObjectRequestType.add;
+            objectRequest.element = environmentPart.partData;
+
+            request.serializedRequest = JsonUtility.ToJson(objectRequest);
+
+            clientHandlerRef.Send(request);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        Debug.Log("Avatar leaving : " + other);
+
+        EnvironmentPart environmentPart = other.GetComponentInParent<EnvironmentPart>();
+
+        if (environmentPart)
+        {
+            NetworkRequest request = new NetworkRequest();
+            request.sender = ServerManager.instance.server;
+            request.requestType = RequestType.objectUpdate;
+
+            ObjectRequest objectRequest = new ObjectRequest();
+            objectRequest.requestType = ObjectRequestType.remove;
+            objectRequest.element = environmentPart.partData;
+
+            request.serializedRequest = JsonUtility.ToJson(objectRequest);
+
+            clientHandlerRef.Send(request);
         }
     }
 }

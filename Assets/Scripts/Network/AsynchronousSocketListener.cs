@@ -75,7 +75,12 @@ public class AsynchronousSocketListener
 
         //clientHandler.Receive();
         UnityEngine.Debug.Log("Requesting user Login");
-        clientHandler.Send(RequestType.login);
+
+        NetworkRequest request = new NetworkRequest();
+        request.sender = ServerManager.instance.server;
+        request.requestType = RequestType.login;
+
+        clientHandler.Send(request);
         clientHandler.Receive();
     }
 
