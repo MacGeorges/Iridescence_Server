@@ -22,71 +22,83 @@ public class StateObject
 
 public class AsynchronousSocketListener
 {
+    public static UdpClient udpServer;
+
     public static ManualResetEvent allDone = new ManualResetEvent(false);
 
     public static void StartListening()
     {
-        IPHostEntry ipHostInfo = Dns.GetHostEntry("localhost");
-        IPAddress ipAddress = ipHostInfo.AddressList[0];
-        IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
+        udpServer = new UdpClient(11000);
 
-        Socket listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-        try
+        while (true)
         {
-            listener.Bind(localEndPoint);
-            listener.Listen(100);
+            IPEndPoint remoteEP = new IPEndPoint(IPAddress.Any, 11000);
+            byte[] data = udpServer.Receive(ref remoteEP); // listen on port 11000
 
-            while (true)
+            string message = Encoding.ASCII.GetString(data);
+
+            UnityEngine.Debug.Log("receive data from " + remoteEP.ToString() + " : " + message);
+
+            ClientHandler newClient = ClientsManager.instance.connectedClients.Find(c => (c.user.userIP == remoteEP.Address.Address) && (c.user.userPort == remoteEP.Port));
+
+            if (newClient == null)
             {
-                allDone.Reset();
+                UnityEngine.Debug.Log("New client!");
 
-                listener.BeginAccept(new AsyncCallback(AcceptCallback), listener);
+                newClient = new ClientHandler();
+                newClient.user = new NetworkUser();
+                newClient.user.userType = UserType.client;
+                newClient.user.userIP = remoteEP.Address.Address;
+                newClient.user.userPort = remoteEP.Port;
+                UnityEngine.Debug.Log("Handler Created");
 
-                allDone.WaitOne();
+                ClientsManager.instance.connectedClients.Add(newClient);
+                ClientsManager.instance.pendingAvatarsAdd.Add(newClient);
+                UnityEngine.Debug.Log("Handler referenced");
+                newClient.StartListening();
+                UnityEngine.Debug.Log("Handler is now listening");
             }
+
+            //byte[] byteData = Encoding.ASCII.GetBytes("Ok boomer");
+
+            //udpServer.Send(byteData, byteData.Length, remoteEP); // reply back
         }
-        catch (Exception e)
-        {
-            UnityEngine.Debug.Log(e.ToString());
-        }
-        ShutdownSocket(listener);
-        UnityEngine.Debug.Log("\nServer Stopped");
     }
 
-    public static void AcceptCallback(IAsyncResult ar)
-    {
-        UnityEngine.Debug.Log("AcceptCallback");
-        allDone.Set();
+    //public static void AcceptCallback(IAsyncResult ar)
+    //{
+    //    UnityEngine.Debug.Log("AcceptCallback");
+    //    allDone.Set();
 
-        Socket listener = (Socket)ar.AsyncState;
-        Socket handler = listener.EndAccept(ar);
+    //    Socket listener = (Socket)ar.AsyncState;
+    //    Socket handler = listener.EndAccept(ar);
 
-        ClientHandler clientHandler = new ClientHandler();
+    //    ClientHandler clientHandler = new ClientHandler();
 
-        clientHandler.user = new NetworkUser();
-        clientHandler.user.userType = UserType.client;
+    //    clientHandler.user = new NetworkUser();
+    //    clientHandler.user.userType = UserType.client;
 
-        clientHandler.state = new StateObject();
-        clientHandler.state.workSocket = handler;
+    //    clientHandler.state = new StateObject();
+    //    clientHandler.state.workSocket = handler;
 
-        ClientsManager.instance.connectedClients.Add(clientHandler);
-        ClientsManager.instance.pendingAvatarsAdd.Add(clientHandler);
-        UnityEngine.Debug.Log("\nNew client connected");
+    //    ClientsManager.instance.connectedClients.Add(clientHandler);
+    //    ClientsManager.instance.pendingAvatarsAdd.Add(clientHandler);
+    //    UnityEngine.Debug.Log("\nNew client connected");
 
-        //clientHandler.Receive();
-        UnityEngine.Debug.Log("Requesting user Login");
+    //    //clientHandler.Receive();
+    //    UnityEngine.Debug.Log("Requesting user Login");
 
-        NetworkRequest request = new NetworkRequest();
-        request.sender = ServerManager.instance.server;
-        request.requestType = RequestType.login;
+    //    NetworkRequest request = new NetworkRequest();
+    //    request.sender = ServerManager.instance.server;
+    //    request.requestType = RequestType.login;
 
-        clientHandler.Send(request);
-        clientHandler.Receive();
-    }
+    //    clientHandler.Send(request);
+    //    clientHandler.Receive();
+    //}
 
-    public static void ShutdownSocket(Socket socket)
-    {
-        socket.Shutdown(SocketShutdown.Both);
-        socket.Close();
-    }
+    //public static void ShutdownSocket(Socket socket)
+    //{
+    //    socket.Shutdown(SocketShutdown.Both);
+    //    socket.Close();
+    //}
 }

@@ -1,98 +1,53 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using UnityEngine;
 
-[System.Serializable]
+[Serializable]
 public class ClientHandler
 {
     public NetworkUser user;
-    public StateObject state;
+    //public StateObject state;
+
+    IPEndPoint remoteEP;
 
     public NetworkAvatar avatarRef;
 
     public bool authenticated;
 
+    public void StartListening()
+    {
+        remoteEP = new IPEndPoint(user.userIP, user.userPort);
+        Debug.Log("EndPoint created : " + remoteEP);
+
+        while (true)
+        {           
+            byte[] data = AsynchronousSocketListener.udpServer.Receive(ref remoteEP);
+
+            string message = Encoding.ASCII.GetString(data);
+
+            //Debug.Log("receive data from " + remoteEP.ToString() + " : " + message);
+
+            if (message.Contains("<EOR>"))
+            {
+
+                message = message.Replace("<EOR>", "");
+
+                HandleRequest(JsonUtility.FromJson<NetworkRequest>(message));
+            }
+        }
+    }
+
     public void Send(NetworkRequest request)
     {
-        byte[] byteData = Encoding.ASCII.GetBytes(JsonUtility.ToJson(request) + "<EOF>");
+        byte[] byteData = Encoding.ASCII.GetBytes(JsonUtility.ToJson(request) + "<EOR>");
 
         //Debug.Log("Sending message to client : " + JsonUtility.ToJson(request));
 
-        state.workSocket.BeginSend(byteData, 0, byteData.Length, 0,
-            new AsyncCallback(SendCallback), state.workSocket);
-    }
-
-    private void SendCallback(IAsyncResult ar)
-    {
-        try
-        {
-            int bytesSent = state.workSocket.EndSend(ar);
-            //Debug.Log("Sent " + bytesSent + " bytes to client.");
-        }
-        catch (Exception e)
-        {
-            Debug.Log(e.ToString());
-        }
-    }
-
-    public void Receive()
-    {
-        try
-        {
-            state.workSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                new AsyncCallback(ReceiveCallback), state);
-        }
-        catch (Exception e)
-        {
-            Debug.Log(e.ToString());
-        }
-    }
-
-    private void ReceiveCallback(IAsyncResult ar)
-    {
-        try
-        {
-            string message = string.Empty;
-
-            int bytesRead = state.workSocket.EndReceive(ar);
-
-            if (bytesRead > 0)
-            {
-                message = Encoding.ASCII.GetString(state.buffer, 0, bytesRead);
-
-                if (message.Contains("<EOF>"))
-                {
-                    string[] messages = message.Split("<EOF>");
-
-                    foreach (string subMessage in messages)
-                    {
-                        string cleanSubMessage = subMessage.Replace("<EOF>", "");
-
-                        if (string.IsNullOrEmpty(cleanSubMessage)) { continue; }
-
-                        HandleRequest(JsonUtility.FromJson<NetworkRequest>(cleanSubMessage));
-                    }
-
-                    state.buffer = new byte[StateObject.BufferSize];
-                    state.workSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                    new AsyncCallback(ReceiveCallback), state);
-
-                    return;
-                }
-
-                // Not all data received. Get more.  
-                state.workSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                new AsyncCallback(ReceiveCallback), state);
-
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.Log(e.ToString());
-        }
+        AsynchronousSocketListener.udpServer.Send(byteData, byteData.Length, remoteEP);
     }
 
     private void HandleRequest(NetworkRequest request)

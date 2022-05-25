@@ -37,7 +37,7 @@ public class ClientsManager : MonoBehaviour
         Dictionary<ClientHandler, SerializableTransform> pendingAvatarsUpdateWork = new Dictionary<ClientHandler, SerializableTransform>(pendingAvatarsUpdate);
         pendingAvatarsUpdate = new Dictionary<ClientHandler, SerializableTransform>();
 
-        foreach(KeyValuePair<ClientHandler, SerializableTransform> pendingAvatar in pendingAvatarsUpdateWork)
+        foreach (KeyValuePair<ClientHandler, SerializableTransform> pendingAvatar in pendingAvatarsUpdateWork)
         {
             if (!pendingAvatar.Key.avatarRef) { continue; }
 
@@ -48,14 +48,18 @@ public class ClientsManager : MonoBehaviour
 
     public void AvatarUpdate(NetworkRequest playerRequest)
     {
-        ClientHandler client = connectedClients.Find(c => c.user.userID == playerRequest.sender.userID);
+        ClientHandler client = connectedClients.Find(c => c.user == playerRequest.sender);
 
-        if(client != null)
+        if (client != null)
         {
             if (!pendingAvatarsUpdate.ContainsKey(client))
             {
                 pendingAvatarsUpdate.Add(client, JsonUtility.FromJson<PlayerActionRequest>(playerRequest.serializedRequest).spatialData);
             }
+        }
+        else
+        {
+            Debug.Log("Can't find the player to update :(");
         }
     }
 }

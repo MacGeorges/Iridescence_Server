@@ -29,7 +29,7 @@ public class CloudWrapperHelper : MonoBehaviour
 
                     if (Callback != null)
                     {
-                        Callback(webRequest.error);
+                        Callback(string.Empty);
                     }
                     break;
                 case UnityWebRequest.Result.DataProcessingError:
@@ -37,7 +37,7 @@ public class CloudWrapperHelper : MonoBehaviour
 
                     if (Callback != null)
                     {
-                        Callback(webRequest.error);
+                        Callback(string.Empty);
                     }
                     break;
                 case UnityWebRequest.Result.ProtocolError:
@@ -45,7 +45,7 @@ public class CloudWrapperHelper : MonoBehaviour
 
                     if (Callback != null)
                     {
-                        Callback(webRequest.error);
+                        Callback(string.Empty);
                     }
                     break;
                 case UnityWebRequest.Result.Success:
