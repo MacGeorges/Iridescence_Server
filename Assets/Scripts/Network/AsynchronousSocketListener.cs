@@ -30,14 +30,15 @@ public class AsynchronousSocketListener
     {
         udpServer = new UdpClient(11000);
 
+        IPEndPoint remoteEP = new IPEndPoint(IPAddress.Any, 11000);
+
         while (true)
         {
-            IPEndPoint remoteEP = new IPEndPoint(IPAddress.Any, 11000);
             byte[] data = udpServer.Receive(ref remoteEP); // listen on port 11000
 
             string message = Encoding.ASCII.GetString(data);
 
-            UnityEngine.Debug.Log("receive data from " + remoteEP.ToString() + " : " + message);
+            //UnityEngine.Debug.Log("receive data from " + remoteEP.ToString() + " : " + message);
 
             ClientHandler newClient = ClientsManager.instance.connectedClients.Find(c => (c.user.userIP == remoteEP.Address.Address) && (c.user.userPort == remoteEP.Port));
 
@@ -50,13 +51,17 @@ public class AsynchronousSocketListener
                 newClient.user.userType = UserType.client;
                 newClient.user.userIP = remoteEP.Address.Address;
                 newClient.user.userPort = remoteEP.Port;
-                UnityEngine.Debug.Log("Handler Created");
+                //UnityEngine.Debug.Log("Handler Created");
 
                 ClientsManager.instance.connectedClients.Add(newClient);
                 ClientsManager.instance.pendingAvatarsAdd.Add(newClient);
-                UnityEngine.Debug.Log("Handler referenced");
+                //UnityEngine.Debug.Log("Handler referenced");
+
+                message = message.Replace("<EOR>", string.Empty);
+                newClient.HandleRequest(UnityEngine.JsonUtility.FromJson<NetworkRequest>(message));
+
                 newClient.StartListening();
-                UnityEngine.Debug.Log("Handler is now listening");
+                //UnityEngine.Debug.Log("Handler is now listening");
             }
 
             //byte[] byteData = Encoding.ASCII.GetBytes("Ok boomer");

@@ -21,7 +21,13 @@ public class ClientHandler
     public void StartListening()
     {
         remoteEP = new IPEndPoint(user.userIP, user.userPort);
-        Debug.Log("EndPoint created : " + remoteEP);
+        //Debug.Log("EndPoint created : " + remoteEP);
+
+        NetworkRequest responseRequest = new NetworkRequest();
+        responseRequest.sender = ServerManager.instance.server;
+        responseRequest.requestType = RequestType.login;
+        responseRequest.serializedRequest = JsonUtility.ToJson(user);
+        Send(responseRequest);
 
         while (true)
         {           
@@ -50,7 +56,7 @@ public class ClientHandler
         AsynchronousSocketListener.udpServer.Send(byteData, byteData.Length, remoteEP);
     }
 
-    private void HandleRequest(NetworkRequest request)
+    public void HandleRequest(NetworkRequest request)
     {
         //Debug.Log("Recieved " + request.requestType);
         switch (request.requestType)
@@ -59,8 +65,7 @@ public class ClientHandler
                 Send(request);
                 break;
             case RequestType.login:
-                user.userID = request.sender.userID;
-                authenticated = true;
+                ServerManager.instance.server = JsonUtility.FromJson<NetworkUser>(request.serializedRequest);
                 break;
             case RequestType.regionChange:
                 break;
