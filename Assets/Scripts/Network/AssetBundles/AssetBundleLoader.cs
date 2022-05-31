@@ -12,6 +12,8 @@ public class AssetBundleLoader : MonoBehaviour
 
     IEnumerator LoadAssetBundleCoroutine(string resourceUrl, System.Action<GameObject> Callback)
     {
+        //Debug.Log("LoadAssetBundleCoroutine " + resourceUrl);
+
         UnityWebRequest www = UnityWebRequestAssetBundle.GetAssetBundle(resourceUrl);
         yield return www.SendWebRequest();
 

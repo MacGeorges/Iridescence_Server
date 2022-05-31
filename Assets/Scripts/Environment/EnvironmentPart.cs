@@ -17,11 +17,18 @@ public class EnvironmentPart : MonoBehaviour
 
     private void SpawnPart(string partData)
     {
-        Part part = JsonUtility.FromJson<Part>(partData);
+        try
+        {
+            Part part = JsonUtility.FromJson<Part>(partData);
 
-        GameObject BundlerLoaderHelper = new GameObject();
-        AssetBundleLoader BundleLoader = BundlerLoaderHelper.AddComponent<AssetBundleLoader>();
-        BundleLoader.LoadAssetBundle(part.resourceURL, SpawnedPart);
+            GameObject BundlerLoaderHelper = new GameObject();
+            AssetBundleLoader BundleLoader = BundlerLoaderHelper.AddComponent<AssetBundleLoader>();
+            BundleLoader.LoadAssetBundle(part.resourceURL, SpawnedPart);
+        }
+        catch
+        {
+            Debug.LogError("Unable to spawn part : " + partData);
+        }
     }
 
     private void SpawnedPart(GameObject spawnedPart)

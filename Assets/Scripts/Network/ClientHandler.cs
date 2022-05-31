@@ -55,7 +55,7 @@ public class ClientHandler
 
     public void HandleRequest(NetworkRequest request)
     {
-        Debug.Log("Recieved request : " + request.requestType);
+        //Debug.Log("Recieved request : " + request.requestType);
         switch (request.requestType)
         {
             case RequestType.ping:

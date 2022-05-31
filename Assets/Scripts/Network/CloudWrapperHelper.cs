@@ -17,6 +17,7 @@ public class CloudWrapperHelper : MonoBehaviour
 
     IEnumerator Request_Coroutine_GET(string uri, System.Action<string> Callback)
     {
+        //Debug.Log("Wrapper request : " + uri);
         using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
         {
             // Request and wait for the desired page.
