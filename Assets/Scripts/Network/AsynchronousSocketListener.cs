@@ -38,7 +38,7 @@ public class AsynchronousSocketListener
 
             string message = Encoding.ASCII.GetString(data);
 
-            //UnityEngine.Debug.Log("receive data from " + remoteEP.ToString() + " : " + message);
+            UnityEngine.Debug.Log("receive data from " + remoteEP.ToString() + " : " + message);
 
             ClientHandler newClient = ClientsManager.instance.connectedClients.Find(c => (c.user.userIP == remoteEP.Address.Address) && (c.user.userPort == remoteEP.Port));
 
@@ -57,10 +57,13 @@ public class AsynchronousSocketListener
                 ClientsManager.instance.pendingAvatarsAdd.Add(newClient);
                 //UnityEngine.Debug.Log("Handler referenced");
 
+                newClient.Init();
+
                 message = message.Replace("<EOR>", string.Empty);
                 newClient.HandleRequest(UnityEngine.JsonUtility.FromJson<NetworkRequest>(message));
 
                 newClient.StartListening();
+
                 //UnityEngine.Debug.Log("Handler is now listening");
             }
 
