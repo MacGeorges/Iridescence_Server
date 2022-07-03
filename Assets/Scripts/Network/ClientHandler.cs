@@ -44,7 +44,7 @@ public class ClientHandler
         }
     }
 
-    public void Send(NetworkRequest request)
+    public void Send(NetworkRequest request, bool reliable = false)
     {
         byte[] byteData = Encoding.ASCII.GetBytes(JsonUtility.ToJson(request) + "<EOR>");
 
@@ -69,7 +69,7 @@ public class ClientHandler
                 responseRequest.requestType = RequestType.login;
                 responseRequest.serializedRequest = JsonUtility.ToJson(user);
                 Send(responseRequest);
-
+                avatarRef.shouldInit = true;
                 break;
             case RequestType.regionChange:
                 break;

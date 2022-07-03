@@ -9,16 +9,29 @@ public class NetworkAvatar : MonoBehaviour
 
     private SphereCollider sphereCollider;
 
+    public bool shouldInit = false;
+
     private void Start()
     {
         sphereCollider = GetComponent<SphereCollider>();
 
-        StartCoroutine(InitSphere());
+        shouldInit = true;
+    }
+
+    private void Update()
+    {
+        if(shouldInit)
+        {
+            shouldInit = false;
+
+            StartCoroutine(InitSphere());
+        }
     }
 
     IEnumerator InitSphere()
     {
-        while(sphereCollider.radius < 10)
+        sphereCollider.radius = 0;
+        while (sphereCollider.radius < 10)
         {
             sphereCollider.radius += 0.01f;
             yield return new WaitForEndOfFrame();
