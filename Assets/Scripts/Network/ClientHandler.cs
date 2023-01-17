@@ -21,7 +21,6 @@ public class ClientHandler
     public void Init()
     {
         remoteEP = new IPEndPoint(user.userIP, user.userPort);
-        //Debug.Log("EndPoint created : " + remoteEP);
     }
 
     public void StartListening()
@@ -62,7 +61,7 @@ public class ClientHandler
                 Send(request);
                 break;
             case RequestType.login:
-                ServerManager.instance.server = JsonUtility.FromJson<NetworkUser>(request.serializedRequest);
+                user = JsonUtility.FromJson<NetworkUser>(request.serializedRequest);
 
                 NetworkRequest responseRequest = new NetworkRequest();
                 responseRequest.sender = ServerManager.instance.server;

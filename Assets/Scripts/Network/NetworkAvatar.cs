@@ -23,7 +23,6 @@ public class NetworkAvatar : MonoBehaviour
         if(shouldInit)
         {
             shouldInit = false;
-
             StartCoroutine(InitSphere());
         }
     }
