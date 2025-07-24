@@ -25,6 +25,7 @@ public class EnvironmentManager : MonoBehaviour
 
     private void SpawnBaseEnvironment(string serializedData)
     {
+        Debug.Log(serializedData);
         if(string.IsNullOrEmpty(serializedData)){ return; }
         regionElements = JsonUtility.FromJson<RegionElements>(serializedData);
 

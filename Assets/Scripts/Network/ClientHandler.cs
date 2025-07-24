@@ -54,7 +54,7 @@ public class ClientHandler
 
     public void HandleRequest(NetworkRequest request)
     {
-        //Debug.Log("Recieved request : " + request.requestType);
+        Debug.Log("Recieved request : " + request.requestType);
         switch (request.requestType)
         {
             case RequestType.ping:
@@ -68,7 +68,7 @@ public class ClientHandler
                 responseRequest.requestType = RequestType.login;
                 responseRequest.serializedRequest = JsonUtility.ToJson(user);
                 Send(responseRequest);
-                avatarRef.shouldInit = true;
+                //avatarRef.shouldInit = true;
                 break;
             case RequestType.regionChange:
                 break;
