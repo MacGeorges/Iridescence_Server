@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 public class NetworkStructures : MonoBehaviour { }
@@ -27,6 +28,43 @@ public enum RequestMethod
     Post
 }
 
+public struct ServerConnection
+{
+    //public ServerConnectionInfo serverConnectionInfo;
+    public NetworkUser networkUser;
+    public Thread thread;
+    public ConnexionType connexionType;
+    public UDP_Client udpClient;
+    public TCP_Client tcpClient;
+
+    public ServerConnection(NetworkUser networkUser, Thread thread, ConnexionType connexionType, UDP_Client udpClient, TCP_Client tcpClient)
+    {
+        this.networkUser = networkUser;
+        this.thread = thread;
+        this.connexionType = connexionType;
+        this.udpClient = udpClient;
+        this.tcpClient = tcpClient;
+    }
+
+    public static bool operator ==(ServerConnection sc1, ServerConnection sc2)
+    {
+        return sc1.networkUser == sc2.networkUser &&
+            sc1.thread == sc2.thread &&
+            sc1.connexionType == sc2.connexionType &&
+            sc1.udpClient == sc2.udpClient &&
+            sc1.tcpClient == sc2.tcpClient;
+    }
+
+    public static bool operator !=(ServerConnection sc1, ServerConnection sc2)
+    {
+        return sc1.networkUser != sc2.networkUser ||
+            sc1.thread != sc2.thread ||
+            sc1.connexionType != sc2.connexionType ||
+            sc1.udpClient != sc2.udpClient ||
+            sc1.tcpClient != sc2.tcpClient;
+    }
+}
+
 [Serializable]
 public struct NetworkUser
 {
@@ -45,6 +83,11 @@ public struct NetworkUser
     {
         return (c1.userIP != c2.userIP || c1.userPort != c2.userPort);
     }
+}
+public enum ConnexionType
+{
+    UDP,
+    TCP
 }
 
 [Serializable]
